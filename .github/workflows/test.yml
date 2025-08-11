@@ -1,0 +1,28 @@
+name: 5 minutes
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  push:                     
+    branches:
+      - "**"
+  workflow_dispatch:   
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: URL
+        run: |
+          M=$(TZ=Asia/Seoul date +%M)
+          ID=$((10#$M + 1))
+          URL="https://jsonplaceholder.typicode.com/todos/${ID}"
+          echo "URL=$URL" >> $GITHUB_ENV
+      - name: JSON
+        run: |
+          curl -fsSL "$URL" -o /tmp/test.json
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: test.json
+          path: /tmp/test.json
